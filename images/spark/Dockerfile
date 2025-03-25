@@ -32,11 +32,11 @@ ENV PATH "${JAVA_HOME}/bin:$PATH"
  #| Instalando Spark 3.3.2 |
  #+------------------------+
 
-RUN curl -O https://dlcdn.apache.org/spark/spark-3.5.3/spark-3.5.3-bin-hadoop3.tgz &&\
-    tar zxvf spark-3.5.3-bin-hadoop3.tgz -C /usr/local &&\
-    rm spark-3.5.3-bin-hadoop3.tgz &&\
+RUN curl -O https://archive.apache.org/dist/spark/spark-3.3.4/spark-3.3.4-bin-hadoop3.tgz &&\
+    tar zxvf spark-3.3.4-bin-hadoop3.tgz -C /usr/local &&\
+    rm spark-3.3.4-bin-hadoop3.tgz &&\
     cd /usr/local &&\
-    ln -sT spark-3.5.3-bin-hadoop3 spark
+    ln -sT spark-3.3.4-bin-hadoop3 spark
 
 RUN echo "export SPARK_HOME=/usr/local/spark" >> ~/.bashrc
 RUN echo "export PATH=\$SPARK_HOME/bin:\$PATH" >> ~/.bashrc
