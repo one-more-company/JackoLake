@@ -29,7 +29,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-18-openjdk-amd64
 ENV PATH "${JAVA_HOME}/bin:$PATH"
 
  #+------------------------+
- #| Instalando Spark 3.3.2 |
+ #| Instalando Spark 3.3.4 |
  #+------------------------+
 
 RUN curl -O https://archive.apache.org/dist/spark/spark-3.3.4/spark-3.3.4-bin-hadoop3.tgz &&\

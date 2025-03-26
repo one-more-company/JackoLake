@@ -1,0 +1,20 @@
+version: 0.1.1
+default:
+  trino:
+    catalog: delta # Change this to the catalog of your choice
+    host: 172.24.152.151
+    http_headers:
+      X-Something: "mage=power"
+    http_scheme: http
+    password: # Optional
+    port: 8080
+    schema: core_data
+    session_properties: # Optional
+      acc01.optimize_locality_enabled: false
+      optimize_hash_generation: true
+    source: trino-cli # Optional
+    user:
+    verify: # Optional
+    data_type_properties:
+      timestamp_precision: 3 # Optional. Set TIMESTAMP(n) precision
+    overwrite_types: # Optional
