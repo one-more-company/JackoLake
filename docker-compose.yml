@@ -111,14 +111,14 @@ services:
     environment:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=password
-  mage:
-    image: mageai/mageai:latest
+   mage:
+    container_name: mage
     networks:
       - my_network
     command: mage start ${PROJECT_NAME}
+    build: ./images/mage
     env_file:
       - .env
-    build: ./mage
     environment:
       USER_CODE_PATH: /home/src/${PROJECT_NAME}
       POSTGRES_DBNAME: ${POSTGRES_DBNAME}

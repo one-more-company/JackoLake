@@ -26,9 +26,15 @@ RUN pip install mage-ai
 
 ARG USER_CODE_PATH=/home/src/${PROJECT_NAME}
 
+COPY conf/io_config.yaml /home/src/${PROJECT_NAME}
+COPY conf/metadata.yaml /home/src/${PROJECT_NAME}
+
+COPY conf/requirements.txt /home/src/${PROJECT_NAME}
+
+RUN pip install -r /home/src/${PROJECT_NAME}/requirements.txt
+
 # RUN mage start /home/src/${PROJECT_NAME}
 
-ARG USER_CODE_PATH=/home/src/${PROJECT_NAME}
 # Note: this overwrites the requirements.txt file in your new project on first run.
 # COPY ./mage/requirements.txt ${USER_CODE_PATH}requirements.txt 
 # RUN pip3 install -r ${USER_CODE_PATH}requirements.txt
@@ -80,6 +86,17 @@ RUN apt-get install nodejs -y
 RUN apt-get install npm -y
 
 
+#+--------------------------------------------+
+#| Installing SQL Magics for Trino e SparkSQL |
+#+--------------------------------------------+
+
+RUN npm install -g sql-language-server
+
+RUN pip install jedi-language-server
+RUN pip install jupyterlab-lsp jupyterlab-sql-editor trino
+RUN pip install dbt-core==1.01
+RUN pip install bokeh
+
 #+----------------+
 #| Installing Git |
 #+----------------+
@@ -89,6 +106,50 @@ RUN pip install jupyterlab-git
 
 
 # Apache Hive
+
+
+#+--------------------------------------------------+
+#| Creating Kernels for Hive and Open Table Formats |
+#+--------------------------------------------------+
+
+# Apache Hive
+
+# Create IPython profile
+RUN ipython profile create pyspark_hive
+# Create PySpark + Hive kernel based on IPython profile
+RUN python3 -m ipykernel install --user --name pyspark_hive --display-name "PySpark (Hive)" --profile pyspark_hive
+COPY kernels/hive/media/logo-svg.svg /root/.local/share/jupyter/kernels/pyspark_hive/
+# Copy startup Script
+COPY kernels/hive/conf/00_startup_pyspark_hive_kernel.py /root/.ipython/profile_pyspark_hive/startup/
+# Configure PySPark + Hive kernel
+COPY kernels/hive/conf/ipython_config.py /root/.ipython/profile_pyspark_hive/
+COPY kernels/hive/conf/ipython_kernel_config.py /root/.ipython/profile_pyspark_hive/
+
+# Apache Iceberg
+
+# Create IPython profile
+RUN ipython profile create pyspark_iceberg
+# Create PySpark + Iceberg kernel based on IPython profile
+RUN python3 -m ipykernel install --user --name pyspark_iceberg --display-name "PySpark (Iceberg)" --profile pyspark_iceberg
+COPY kernels/iceberg/media/logo-svg.svg /root/.local/share/jupyter/kernels/pyspark_iceberg/
+# Copy startup script
+COPY kernels/iceberg/conf/00_startup_pyspark_iceberg_kernel.py  /root/.ipython/profile_pyspark_iceberg/startup/
+# Configure PySPark + Hive kernel
+COPY kernels/iceberg/conf/ipython_config.py /root/.ipython/profile_pyspark_iceberg/
+COPY kernels/iceberg/conf/ipython_kernel_config.py /root/.ipython/profile_pyspark_iceberg/
+
+# Delta Lake
+
+# Create IPython profile
+RUN ipython profile create pyspark_delta
+# Create PySpark + Delta kernel based on IPython profile
+RUN python3 -m ipykernel install --user --name pyspark_delta --display-name "PySpark (Delta)" --profile pyspark_delta
+COPY kernels/delta/media/logo-svg.svg /root/.local/share/jupyter/kernels/pyspark_delta/
+# Copy startup script
+COPY kernels/delta/conf/00_startup_pyspark_delta_kernel.py  /root/.ipython/profile_pyspark_delta/startup/
+# Configure PySPark + Delta kernel
+COPY kernels/delta/conf/ipython_config.py /root/.ipython/profile_pyspark_delta/
+COPY kernels/delta/conf/ipython_kernel_config.py /root/.ipython/profile_pyspark_delta/
 
 #+-----------------------------------------------+
 #| Configurations for  spark-defaults            |
