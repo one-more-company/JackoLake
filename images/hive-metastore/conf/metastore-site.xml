@@ -28,21 +28,21 @@
 
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>hive</value>
+        <value>${HIVE_USER}</value>
     </property>
 
     <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>hive123</value>
+        <value>${HIVE_PASSWORD}</value>
     </property>
 
     <property>
         <name>fs.s3a.access.key</name>
-        <value>admin</value>
+        <value>${AWS_ACCESS_KEY_ID}</value>
     </property>
     <property>
         <name>fs.s3a.secret.key</name>
-        <value>password</value>
+        <value>${AWS_SECRET_ACCESS_KEY}</value>
     </property>
     <property>
         <name>fs.s3a.endpoint</name>

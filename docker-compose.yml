@@ -10,18 +10,23 @@ services:
     volumes:
       - ./mount/minio/data:/data
       - ./mount/minio-config:/root/.minio
+    env_file:
+      - .env  
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
     command: server /data --console-address ":9090"
+
   postgres:
     container_name: postgres
     image: postgres:14.2-alpine
     ports:
       - 5432:5432
+    env_file:
+      - .env  
     environment:
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hive123
+      POSTGRES_USER: ${HIVE_USER}
+      POSTGRES_PASSWORD: ${HIVE_PASSWORD}
       POSTGRES_DB: metastore_db
     depends_on:
       - minio
@@ -29,6 +34,7 @@ services:
       - my_network
     volumes:
       - ./mount/postgres/data:/var/lib/postgresql/data
+      
   hive-metastore:
     container_name: hive-metastore
     build: ./images/hive-metastore
@@ -49,9 +55,11 @@ services:
       - postgres
     networks:
       - my_network
+    env_file:
+      - .env  
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
       - SPARK_LOCAL_IP=spark-master
     command: usr/local/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip spark-master --port 7077 --webui-port 5050
   spark-worker-a:
@@ -61,11 +69,14 @@ services:
       - spark-master
     networks:
       - my_network
+
     ports:
       - "5051:5051"
+    env_file:
+      - .env  
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
       - SPARK_LOCAL_IP=spark-worker-a
     command: usr/local/spark/bin/spark-class org.apache.spark.deploy.worker.Worker --webui-port 5051 spark://spark-master:7077
   spark-worker-b:
@@ -75,11 +86,14 @@ services:
       - spark-master
     networks:
       - my_network
+    
     ports:
       - "5052:5052"
+    env_file:
+      - .env
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
       - SPARK_LOCAL_IP=spark-worker-b
     command: usr/local/spark/bin/spark-class org.apache.spark.deploy.worker.Worker --webui-port 5052 spark://spark-master:7077
   workspace:
@@ -94,9 +108,11 @@ services:
       - "4040:4040"
     volumes:
       - ./work:/usr/local/spark_dev/work
+    env_file:
+      - .env
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
     command: jupyter lab --port 8888 --LabApp.token=''
 
   trino:
@@ -106,32 +122,42 @@ services:
       - hive-metastore
     networks:
       - my_network
+
     ports:
       - "8080:8080"
-    environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
-  mage:
-    image: mageai/mageai:latest
-    networks:
-      - my_network
-    command: mage start ${PROJECT_NAME}
     env_file:
       - .env
-    build: ./mage
     environment:
-      USER_CODE_PATH: /home/src/${PROJECT_NAME}
-      POSTGRES_DBNAME: ${POSTGRES_DBNAME}
-      POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-    ports:
-      - 6789:6789
-    volumes:
-      - ./work:/home/src/
-    restart: on-failure:5
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY_ID}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET_ACCESS_KEY}
+      
+  # mage:
+  #   container_name: mage
+  #   networks:
+  #     - my_network
+  #   command: mage start ${PROJECT_NAME}
+  #   build: ./images/mage
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     USER_CODE_PATH: /home/src/${PROJECT_NAME}
+  #     POSTGRES_DBNAME: ${POSTGRES_DBNAME}
+  #     POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     POSTGRES_PORT: ${POSTGRES_PORT}
+  #     TRINO_HOST: ${TRINO_HOST}
+  #     TRINO_USER: ${TRINO_USER}
+  #     TRINO_PASSWORD: ${TRINO_PASSWORD}
+  #     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+  #     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+  #     AWS_ENDPOINT_URL: ${AWS_ENDPOINT_URL}
+  #   ports:
+  #     - 6789:6789
+  #   volumes:
+  #     - ./work:/home/src/
+  #   restart: on-failure:5
 
 networks:
   my_network:
