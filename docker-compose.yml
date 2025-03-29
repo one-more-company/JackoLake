@@ -116,7 +116,7 @@ services:
     container_name: mage
     networks:
       - my_network
-    command: mage start ${PROJECT_NAME}
+    command: mage start /home/src/${PROJECT_NAME}
     build: ./images/mage
     env_file:
       - .env
