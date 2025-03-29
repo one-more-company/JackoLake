@@ -8,7 +8,7 @@ services:
       - "9000:9000"
       - "9090:9090"
     volumes:
-      - ./mount/minio/data:/data
+      - ./mnt/sda2/mnt/minio/data:/data
       - ./mount/minio-config:/root/.minio
     environment:
       - MINIO_ROOT_USER=admin
@@ -28,7 +28,7 @@ services:
     networks:
       - my_network
     volumes:
-      - ./mount/postgres/data:/var/lib/postgresql/data
+      - ./mnt/sda2/mnt/postgres/data:/var/lib/postgresql/data
   hive-metastore:
     container_name: hive-metastore
     build: ./images/hive-metastore
@@ -94,6 +94,7 @@ services:
       - "4040:4040"
     volumes:
       - ./work:/usr/local/spark_dev/work
+
     environment:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=password
@@ -128,10 +129,15 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_ENDPOINT_URL: ${AWS_ENDPOINT_URL}
     ports:
       - 6789:6789
     volumes:
-      - ./work:/home/src/
+      - .home/src:/home/src/
+      # - ./images/mage/config/io_config.yaml:/home/src/${PROJECT_NAME}/io_config.yaml
+      # - ./images/mage/config/metadata.yaml:/home/src/${PROJECT_NAME}/metadata.yaml
     restart: on-failure:5
 
 networks:

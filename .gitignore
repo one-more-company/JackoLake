@@ -3,3 +3,6 @@ work/projects/olist
 work/projects/pokedex
 # ignore all projects except iceberg_wap
 !iceberg_wap/
+work/default_project
+work/dataplatform
+/mnt
