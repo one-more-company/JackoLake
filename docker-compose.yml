@@ -8,7 +8,8 @@ services:
       - "9000:9000"
       - "9090:9090"
     volumes:
-      - ./mnt/sda2/mnt/minio/data:/data
+      -  minio_volume:/data
+      # - ./mnt/sda2/mnt/minio/data:/data
       - ./mount/minio-config:/root/.minio
     environment:
       - MINIO_ROOT_USER=admin
@@ -28,7 +29,8 @@ services:
     networks:
       - my_network
     volumes:
-      - ./mnt/sda2/mnt/postgres/data:/var/lib/postgresql/data
+      - postgres_volume:/var/lib/postgresql/data
+      # - ./mnt/sda2/mnt/postgres/data:/var/lib/postgresql/data
   hive-metastore:
     container_name: hive-metastore
     build: ./images/hive-metastore
@@ -135,6 +137,7 @@ services:
     ports:
       - 6789:6789
     volumes:
+      - ./mnt/sda2/mnt/mage:/home/src/${PROJECT_NAME}
       - ./home/src:/home/src/
       # - ./images/mage/config/io_config.yaml:/home/src/${PROJECT_NAME}/io_config.yaml
       # - ./images/mage/config/metadata.yaml:/home/src/${PROJECT_NAME}/metadata.yaml
@@ -144,3 +147,9 @@ networks:
   my_network:
     driver: bridge
     name: my_network
+
+volumes:
+  minio_volume:
+    driver: local
+  postgres_volume:
+    driver: local
