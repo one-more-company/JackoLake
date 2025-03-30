@@ -34,6 +34,19 @@ ENV SPARK_HOME=/usr/local/lib/python3.10/dist-packages/pyspark
 
 RUN mkdir -p usr/local/spark_dev/work/
 
+
+#+----------------+
+#| Installing Scala |
+#+----------------+
+
+RUN apt-get install -y wget
+RUN wget https://downloads.lightbend.com/scala/2.12.18/scala-2.12.18.deb
+RUN dpkg -i scala-2.12.18.deb
+RUN apt-get install -f -y  # Fix dependencies if needed
+RUN rm scala-2.12.18.deb  # Correct cleanup step
+# Verify Scala installation
+RUN scala -version
+
 #+----------------------------------+
 #| Installing S3/MinIO dependencies |
 #+----------------------------------+
